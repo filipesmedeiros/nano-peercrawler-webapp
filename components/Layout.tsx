@@ -1,10 +1,16 @@
+import {
+  donationAddress,
+  email,
+  fediverse,
+  github,
+  network,
+  twitter,
+} from 'lib/constants'
 import { FC, ReactNode, useEffect } from 'react'
 
 export interface Props {
   children: ReactNode
 }
-
-const network = process.env.NEXT_PUBLIC_NANO_NETWORK
 
 const toggleHtmlDarkClass = () =>
   document.querySelector('html')!.classList.toggle('dark')
@@ -36,6 +42,55 @@ const Layout: FC<Props> = ({ children }) => {
         Toggle dark mode
       </button>
       {children}
+      <footer className="flex flex-col gap-3">
+        <span id="not-maintained">
+          Not maintained by{' '}
+          <a
+            className="text-blue-500 hover:text-blue-800"
+            href="https://nano.org/nano-foundation"
+          >
+            The Nano Foundation
+          </a>
+        </span>
+        <a className="text-blue-500 hover:text-blue-800 w-fit" href={github}>
+          Github repo with code
+        </a>
+        <a
+          className="text-blue-500 hover:text-blue-800 w-fit"
+          href="https://test.nano.org/"
+        >
+          More info on the nano test network
+        </a>
+        <span>
+          Contact me on{' '}
+          <a
+            className="text-blue-500 hover:text-blue-800"
+            href={`https://twitter.com/${twitter}`}
+          >
+            Twitter
+          </a>
+          ,{' '}
+          <a className="text-blue-500 hover:text-blue-800" href={fediverse}>
+            the fediverse
+          </a>{' '}
+          or by{' '}
+          <a
+            className="text-blue-500 hover:text-blue-800"
+            href={`mailto:${email}`}
+          >
+            email
+          </a>
+        </span>
+        <span className="text-xs">
+          Donations:{' '}
+          <a
+            className="text-blue-500 hover:text-blue-800"
+            href={`nano:${donationAddress}`}
+          >
+            {donationAddress}
+          </a>
+        </span>
+      </footer>
     </div>
   )
 }
