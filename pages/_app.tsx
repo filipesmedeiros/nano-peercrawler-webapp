@@ -1,10 +1,20 @@
 import type { AppProps } from 'next/app'
-import { FC, useEffect } from 'react'
-import 'tailwindcss/tailwind.css'
+import { FC } from 'react'
+import { SWRConfig } from 'swr'
+
+import Layout from '@components/Layout'
+
+import fetcher from '../lib/fetcher'
+import '../styles/global.css'
 
 const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
-  useEffect(() => {}, [])
-  return <Component {...pageProps} />
+  return (
+    <SWRConfig value={{ fetcher }}>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </SWRConfig>
+  )
 }
 
 export default MyApp

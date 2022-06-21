@@ -3,7 +3,8 @@
   "semi": false,
   "singleQuote": true,
 
-  "importOrder": ["<THIRD_PARTY_MODULES>", "^[./]"],
+  "plugins": ["./node_modules/@trivago/prettier-plugin-sort-imports"],
+  "importOrder": ["<THIRD_PARTY_MODULES>", "^@components/", "^[./]"],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
 }
