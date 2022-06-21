@@ -24,7 +24,7 @@ const Home = () => {
       )}
       {peers && (
         <div className="flex flex-col gap-2">
-          <div className="flex gap-2 px-3 py-2 bg-blue-200 w-fit rounded">
+          <div className="flex gap-2 px-3 py-2 bg-blue-200 dark:bg-blue-900 dark:text-white w-fit rounded">
             <Search />
             <input
               className="bg-transparent"
