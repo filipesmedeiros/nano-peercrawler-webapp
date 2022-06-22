@@ -3,6 +3,9 @@ import { PeerInfo, SortDirection } from 'lib/types'
 import { FC, useMemo, useState } from 'react'
 
 import Table from './Table'
+import BadgeCheck from './icons/BadgeCheck'
+import Ban from './icons/Ban'
+import Voting from './icons/Voting'
 
 export interface Props {
   peers: PeerInfo[]
@@ -111,6 +114,8 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
   return (
     <Table>
       <Table.Head>
+        <Table.HeadCell noPadding />
+        <Table.HeadCell noPadding />
         <Table.HeadCell
           sortDirection={tableSorting.sorting.peer_id}
           onClick={onColumnClick('peer_id')}
@@ -124,12 +129,6 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
           Peer IP
         </Table.HeadCell>
         <Table.HeadCell
-          sortDirection={tableSorting.sorting.is_voting}
-          onClick={onColumnClick('is_voting')}
-        >
-          Is peer voting?
-        </Table.HeadCell>
-        <Table.HeadCell
           sortDirection={tableSorting.sorting.last_seen}
           onClick={onColumnClick('last_seen')}
         >
@@ -137,20 +136,39 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
         </Table.HeadCell>
       </Table.Head>
       <Table.Body>
-        {filteredPeers?.map(peer => (
-          <Table.Row key={`${peer.peer_id}-${peer.ip}`}>
-            <Table.Cell>{peer.peer_id ?? '---'}</Table.Cell>
-            <Table.Cell>{peer.ip ?? '---'}</Table.Cell>
-            <Table.Cell>
-              {peer.is_voting !== null ? (peer.is_voting ? '✅' : '❌') : '---'}
-            </Table.Cell>
-            <Table.Cell>
-              {peer.last_seen
-                ? new Date(peer.last_seen * 1e3).toLocaleString()
-                : '---'}
-            </Table.Cell>
-          </Table.Row>
-        ))}
+        {filteredPeers?.map(
+          ({ telemetry, peer_id, ip, is_voting, last_seen }) => (
+            <Table.Row key={`${peer_id}-${ip}`}>
+              <Table.Cell noPadding center>
+                {is_voting && (
+                  <span className="text-blue-500 dark:text-blue-300">
+                    <Voting />
+                  </span>
+                )}
+              </Table.Cell>
+              <Table.Cell noPadding center>
+                {telemetry !== null && telemetry.sig_verified !== null ? (
+                  telemetry.sig_verified ? (
+                    <span className="text-green-500">
+                      <BadgeCheck />
+                    </span>
+                  ) : (
+                    <span className="text-red-500">
+                      <Ban />
+                    </span>
+                  )
+                ) : (
+                  '---'
+                )}
+              </Table.Cell>
+              <Table.Cell>{peer_id ?? '---'}</Table.Cell>
+              <Table.Cell>{ip ?? '---'}</Table.Cell>
+              <Table.Cell>
+                {last_seen ? new Date(last_seen * 1e3).toLocaleString() : '---'}
+              </Table.Cell>
+            </Table.Row>
+          )
+        )}
       </Table.Body>
     </Table>
   )

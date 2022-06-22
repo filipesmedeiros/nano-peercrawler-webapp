@@ -7,6 +7,7 @@ specifiers:
   '@types/react-dom': ^18.0.5
   '@typescript-eslint/parser': ^5.28.0
   autoprefixer: ^10.4.7
+  clsx: ^1.1.1
   eslint: 8.4.1
   eslint-config-next: ^12.1.6
   eslint-config-prettier: ^8.5.0
@@ -26,6 +27,7 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
+  clsx: 1.1.1
   ip-address: 8.1.0
   next: 12.1.6_biqbaboplfbrettd7655fr4n2y
   prettier: 2.7.1
@@ -1137,6 +1139,11 @@ packages:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
     dev: true
+
+  /clsx/1.1.1:
+    resolution: {integrity: sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==}
+    engines: {node: '>=6'}
+    dev: false
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}

@@ -18,6 +18,7 @@
     "gen:hook": "hygen hook new"
   },
   "dependencies": {
+    "clsx": "^1.1.1",
     "ip-address": "^8.1.0",
     "next": "^12.1.6",
     "prettier": "^2.7.1",
