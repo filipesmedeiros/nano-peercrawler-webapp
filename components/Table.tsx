@@ -76,13 +76,7 @@ Table.Row = ({ children }) => (
 Table.Row.displayName = 'TableRow'
 
 Table.Cell = ({ children, noPadding = false, center = false }) => (
-  <td
-    className={clsx(
-      'w-4',
-      !noPadding && 'p-4',
-      center && 'p-1 flex justify-center'
-    )}
-  >
+  <td className={clsx('w-4', !noPadding && 'p-4', center && 'p-1 text-center')}>
     {children}
   </td>
 )
