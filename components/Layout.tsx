@@ -14,11 +14,10 @@ export interface Props {
 
 const toggleHtmlDarkClass = () => {
   const html = document.querySelector('html')!
-  html.setAttribute(
-    'data-theme',
-    html.getAttribute('data-theme') === 'light' ? 'dark' : 'light'
-  )
-  html.classList.toggle('dark')
+  const isLight = html.getAttribute('data-theme') === 'light'
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light')
+  if (isLight) html.classList.add('dark')
+  else html.classList.remove('dark')
 }
 
 const addHtmlDarkClass = () => {
