@@ -134,7 +134,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
     </button>
   )
 
-  const [copiedPeerId, setCopiedPeerId] = useState(undefined)
+  const [copiedPeerId, setCopiedPeerId] = useState<string>()
   useTimeoutWhen(
     () => setCopiedPeerId(undefined),
     2e3,

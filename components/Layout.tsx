@@ -12,11 +12,20 @@ export interface Props {
   children: ReactNode
 }
 
-const toggleHtmlDarkClass = () =>
-  document.querySelector('html')!.classList.toggle('dark')
+const toggleHtmlDarkClass = () => {
+  const html = document.querySelector('html')!
+  html.setAttribute(
+    'data-theme',
+    html.getAttribute('data-theme') === 'light' ? 'dark' : 'light'
+  )
+  html.classList.toggle('dark')
+}
 
-const addHtmlDarkClass = () =>
-  document.querySelector('html')!.classList.add('dark')
+const addHtmlDarkClass = () => {
+  const html = document.querySelector('html')!
+  html.setAttribute('data-theme', 'dark')
+  html.classList.add('dark')
+}
 
 const Layout: FC<Props> = ({ children }) => {
   useEffect(() => {
@@ -32,7 +41,7 @@ const Layout: FC<Props> = ({ children }) => {
 
   return (
     <div className="p-6 flex flex-col gap-4">
-      <h1 className="text-4xl font-bold">
+      <h1 className="text-4xl font-bold dark:text-white">
         Nano {network !== 'live' ? `${network} ` : ''}network peer explorer
       </h1>
       <button className="btn btn-primary w-fit" onClick={onDarkModeClick}>

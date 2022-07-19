@@ -10,11 +10,11 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('daisyui')],
+  plugins: [require('@tailwindcss/typography'), require('daisyui')],
   daisyui: {
     themes: [
       {
-        mytheme: {
+        light: {
           primary: '#38bdf8',
           secondary: '#6ee7b7',
           accent: '#818cf8',
@@ -26,6 +26,7 @@ module.exports = {
           error: '#F87272',
         },
       },
+      'dark',
     ],
   },
 }
