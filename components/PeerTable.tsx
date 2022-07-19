@@ -1,11 +1,17 @@
+import {
+  ArchiveIcon,
+  BadgeCheckIcon,
+  BanIcon,
+  SortAscendingIcon,
+  SortDescendingIcon,
+  SwitchVerticalIcon,
+} from '@heroicons/react/solid'
 import { Address6 } from 'ip-address'
 import { PeerInfo, SortDirection } from 'lib/types'
-import { FC, useMemo, useState } from 'react'
-
-import Table from './Table'
-import BadgeCheck from './icons/BadgeCheck'
-import Ban from './icons/Ban'
-import Voting from './icons/Voting'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { useTimeoutWhen } from 'rooks'
 
 export interface Props {
   peers: PeerInfo[]
@@ -26,27 +32,29 @@ const defaultSorting: TableSorting = {
 }
 
 const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
+  const { push } = useRouter()
+
   const [tableSorting, setTableSorting] = useState<{
     currentSorted: Column | undefined
     sorting: TableSorting
   }>({ sorting: defaultSorting, currentSorted: undefined })
 
-  const onColumnClick =
-    (column: Column) => (prevDirection: 'asc' | 'desc' | undefined) => {
-      const newDirection =
-        prevDirection === 'asc'
-          ? 'desc'
-          : prevDirection === 'desc'
-          ? undefined
-          : 'asc'
-      setTableSorting({
-        currentSorted: newDirection === undefined ? undefined : column,
-        sorting: {
-          ...defaultSorting,
-          [column]: newDirection,
-        },
-      })
-    }
+  const onColumnClick = (column: Column) => {
+    const prevDirection = tableSorting.sorting[column]
+    const newDirection =
+      prevDirection === 'asc'
+        ? 'desc'
+        : prevDirection === 'desc'
+        ? undefined
+        : 'asc'
+    setTableSorting({
+      currentSorted: newDirection === undefined ? undefined : column,
+      sorting: {
+        ...defaultSorting,
+        [column]: newDirection,
+      },
+    })
+  }
 
   const sortedPeers = useMemo(() => {
     if (peers === undefined) return undefined
@@ -111,66 +119,117 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
       )
   }, [sortedPeers, peerIdOrIpSearch])
 
+  const SortingIcon: FC<{ column: Column }> = ({ column }) => (
+    <button
+      className="hover:text-accent active:text-accent"
+      onClick={() => onColumnClick('peer_id')}
+    >
+      {tableSorting.sorting[column] === 'asc' ? (
+        <SortDescendingIcon className="h-5 w-5" />
+      ) : tableSorting.sorting.peer_id === 'desc' ? (
+        <SortAscendingIcon className="h-5 w-5" />
+      ) : (
+        <SwitchVerticalIcon className="h-5 w-5" />
+      )}
+    </button>
+  )
+
+  const [copiedPeerId, setCopiedPeerId] = useState(undefined)
+  useTimeoutWhen(
+    () => setCopiedPeerId(undefined),
+    2e3,
+    copiedPeerId !== undefined
+  )
+
   return (
-    <Table>
-      <Table.Head>
-        <Table.HeadCell noPadding />
-        <Table.HeadCell noPadding />
-        <Table.HeadCell
-          sortDirection={tableSorting.sorting.peer_id}
-          onClick={onColumnClick('peer_id')}
-        >
-          Peer ID
-        </Table.HeadCell>
-        <Table.HeadCell
-          sortDirection={tableSorting.sorting.ip}
-          onClick={onColumnClick('ip')}
-        >
-          Peer IP
-        </Table.HeadCell>
-        <Table.HeadCell
-          sortDirection={tableSorting.sorting.last_seen}
-          onClick={onColumnClick('last_seen')}
-        >
-          Last seen
-        </Table.HeadCell>
-      </Table.Head>
-      <Table.Body>
+    <table className="table">
+      <thead>
+        <tr>
+          <th className="p-0" />
+          <th className="p-0" />
+          <th>
+            <div className="flex items-center gap-2">
+              Peer ID
+              <SortingIcon column="peer_id" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
+              Peer IP
+              <SortingIcon column="ip" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
+              Last seen
+              <SortingIcon column="last_seen" />
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
         {filteredPeers?.map(
           ({ telemetry, peer_id, ip, is_voting, last_seen }) => (
-            <Table.Row key={`${peer_id}-${ip}`}>
-              <Table.Cell noPadding center>
+            <tr
+              key={`${peer_id}-${ip}`}
+              className="hover:active hover:cursor-pointer"
+              onClick={() =>
+                push({ pathname: '/[peerId]', query: { peerId: peer_id } })
+              }
+            >
+              <td className="px-1">
                 {is_voting && (
-                  <span className="text-blue-500 dark:text-blue-300">
-                    <Voting />
+                  <span>
+                    <ArchiveIcon className="h-5 w-5" />
                   </span>
                 )}
-              </Table.Cell>
-              <Table.Cell noPadding center>
+              </td>
+              <td className="px-1">
                 {telemetry !== null && telemetry.sig_verified !== null ? (
                   telemetry.sig_verified ? (
                     <span className="text-green-500">
-                      <BadgeCheck />
+                      <BadgeCheckIcon className="h-5 w-5" />
                     </span>
                   ) : (
                     <span className="text-red-500">
-                      <Ban />
+                      <BanIcon className="h-5 w-5" />
                     </span>
                   )
                 ) : (
                   '---'
                 )}
-              </Table.Cell>
-              <Table.Cell>{peer_id ?? '---'}</Table.Cell>
-              <Table.Cell>{ip ?? '---'}</Table.Cell>
-              <Table.Cell>
+              </td>
+              <td>
+                {peer_id ? (
+                  <div
+                    onClick={e => {
+                      e.stopPropagation()
+                      navigator.clipboard.writeText(peer_id)
+                      setCopiedPeerId(peer_id)
+                    }}
+                    className="tooltip tooltip-secondary"
+                    data-tip={
+                      copiedPeerId === peer_id ? 'Copied!' : 'Click to copy'
+                    }
+                  >
+                    {`${peer_id?.substring(0, 10)}...${peer_id?.substring(
+                      peer_id.length - 10,
+                      peer_id.length
+                    )}`}
+                  </div>
+                ) : (
+                  '---'
+                )}
+              </td>
+              <td>{ip ?? '---'}</td>
+              <td>
                 {last_seen ? new Date(last_seen * 1e3).toLocaleString() : '---'}
-              </Table.Cell>
-            </Table.Row>
+              </td>
+            </tr>
           )
         )}
-      </Table.Body>
-    </Table>
+      </tbody>
+    </table>
   )
 }
 

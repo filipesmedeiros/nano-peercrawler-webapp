@@ -45,7 +45,7 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "workbench.colorTheme": "GitHub Dark Default",
-  "window.zoomLevel": 0,
+  "window.zoomLevel": 1,
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "eslint.format.enable": true,

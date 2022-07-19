@@ -1,11 +1,10 @@
-import { Address6 } from 'ip-address'
+import { SearchIcon } from '@heroicons/react/solid'
 import useDebounce from 'lib/hooks/useDebounce'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import useSWR from 'swr'
 
 import PeerTable from '@components/PeerTable'
 import Spinner from '@components/Spinner'
-import Search from '@components/icons/Search'
 
 import { PeerInfo } from '../lib/types'
 
@@ -23,14 +22,20 @@ const Home = () => {
         </div>
       )}
       {peers && (
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2 px-3 py-2 bg-blue-200 dark:bg-blue-900 dark:text-white w-fit rounded">
-            <Search />
-            <input
-              className="bg-transparent"
-              onInput={e => setPeerIdOrIpSearch(e.currentTarget.value)}
-              value={peerIdOrIpSearch}
-            />
+        <div className="flex flex-col gap-2 overflow-x-scroll">
+          <div className="form-control">
+            <label className="input-group w-fit">
+              <span>
+                <SearchIcon className="h-5 w-5" />
+              </span>
+
+              <input
+                className="input input-bordered"
+                onInput={e => setPeerIdOrIpSearch(e.currentTarget.value)}
+                value={peerIdOrIpSearch}
+                placeholder="Search"
+              />
+            </label>
           </div>
           <PeerTable
             peers={peers}

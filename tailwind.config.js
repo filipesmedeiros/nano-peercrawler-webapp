@@ -2,7 +2,6 @@ module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
-    'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}',
   ],
   darkMode: 'class',
   theme: {
@@ -11,5 +10,22 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('flowbite/plugin')],
+  plugins: [require('daisyui')],
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          primary: '#38bdf8',
+          secondary: '#6ee7b7',
+          accent: '#818cf8',
+          neutral: '#1c1917',
+          'base-100': '#e0f2fe',
+          info: '#2563eb',
+          success: '#22c55e',
+          warning: '#FBBD23',
+          error: '#F87272',
+        },
+      },
+    ],
+  },
 }
