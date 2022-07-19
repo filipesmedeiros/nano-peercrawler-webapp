@@ -12,7 +12,7 @@ export interface Props {
   children: ReactNode
 }
 
-const toggleHtmlDarkClass = () => {
+const toggleHtmlDark = () => {
   const html = document.querySelector('html')!
   const isLight = html.getAttribute('data-theme') === 'light'
   html.setAttribute('data-theme', isLight ? 'dark' : 'light')
@@ -20,19 +20,26 @@ const toggleHtmlDarkClass = () => {
   else html.classList.remove('dark')
 }
 
-const addHtmlDarkClass = () => {
+const addHtmlDark = () => {
   const html = document.querySelector('html')!
   html.setAttribute('data-theme', 'dark')
   html.classList.add('dark')
 }
 
+const removeHtmlDark = () => {
+  const html = document.querySelector('html')!
+  html.setAttribute('data-theme', 'light')
+  html.classList.remove('dark')
+}
+
 const Layout: FC<Props> = ({ children }) => {
   useEffect(() => {
-    if (localStorage.getItem('theme') === 'dark') addHtmlDarkClass()
+    if (localStorage.getItem('theme') === 'dark') addHtmlDark()
+    else removeHtmlDark()
   }, [])
 
   const onDarkModeClick = () => {
-    toggleHtmlDarkClass()
+    toggleHtmlDark()
     if (localStorage.getItem('theme') === 'dark')
       localStorage.setItem('theme', 'light')
     else localStorage.setItem('theme', 'dark')
