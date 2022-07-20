@@ -381,8 +381,7 @@ const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
                     onClick={e => {
                       const textToCopy = `${
                         ip.startsWith('::ffff:') ? ip.substring(7) : `[${ip}]`
-                      }
-                    :${port}`
+                      }:${port}`
                       e.stopPropagation()
                       navigator.clipboard.writeText(textToCopy)
                       setCopiedText(textToCopy)
@@ -390,14 +389,15 @@ const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
                     className="tooltip tooltip-accent"
                     data-tip={
                       copiedText ===
-                      `${ip.startsWith('::ffff:') ? ip.substring(7) : `[${ip}]`}
-                    :${port}`
-                        ? 'Copied raw amount!'
-                        : 'Click to copy raw amount'
+                      `${
+                        ip.startsWith('::ffff:') ? ip.substring(7) : `[${ip}]`
+                      }:${port}`
+                        ? 'Copied!'
+                        : 'Click to copy'
                     }
                   >
-                    `${ip?.startsWith('::ffff:') ? ip?.substring(7) : `[${ip}]`}
-                    :${port}`
+                    {ip?.startsWith('::ffff:') ? ip?.substring(7) : `[${ip}]`}:
+                    {port}
                   </div>
                 ) : (
                   '---'
