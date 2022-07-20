@@ -1,27 +1,46 @@
 import { SearchIcon } from '@heroicons/react/solid'
-import useDebounce from 'lib/hooks/useDebounce'
-import { useState } from 'react'
+import { Address6 } from 'ip-address'
+import { useMemo, useState } from 'react'
 import useSWR from 'swr'
 
 import PeerTable from '@components/PeerTable'
 import Spinner from '@components/Spinner'
 
-import { PeerInfo } from '../lib/types'
+import useDebounce from '@lib/hooks/useDebounce'
+import { NanoCommunityPeerInfo, PeerInfo } from '@lib/types'
+import { isLocationEqual } from '@lib/utils'
 
 const Home = () => {
   const { data: peers } = useSWR<PeerInfo[]>('/api/peers')
+  const { data: communityPeersDetails } = useSWR<NanoCommunityPeerInfo[]>(
+    '/api/communityPeersInfo'
+  )
+
+  const mergedPeers = useMemo(
+    () =>
+      peers?.map(peer => ({
+        ...peer,
+        ...communityPeersDetails?.find(({ address, port }) =>
+          isLocationEqual(
+            { ip: address, port },
+            { ip: peer.ip, port: peer.port }
+          )
+        ),
+      })),
+    [peers, communityPeersDetails]
+  )
 
   const [peerIdOrIpSearch, setPeerIdOrIpSearch] = useState('')
   const peerIdOrIpSearchDebounced = useDebounce(peerIdOrIpSearch)
 
   return (
     <>
-      {!peers && (
+      {!mergedPeers && (
         <div className="w-screen h-screen grid place-content-center">
           <Spinner />
         </div>
       )}
-      {peers && (
+      {mergedPeers && (
         <div className="flex flex-col gap-2 overflow-x-scroll">
           <div className="form-control">
             <label className="input-group w-fit">
@@ -38,7 +57,7 @@ const Home = () => {
             </label>
           </div>
           <PeerTable
-            peers={peers}
+            peers={mergedPeers}
             peerIdOrIpSearch={peerIdOrIpSearchDebounced}
           />
         </div>

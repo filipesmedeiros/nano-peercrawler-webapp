@@ -4,7 +4,8 @@ import { SWRConfig } from 'swr'
 
 import Layout from '@components/Layout'
 
-import fetcher from '../lib/fetcher'
+import fetcher from '@lib/fetcher'
+
 import '../styles/global.css'
 
 const MyApp: FC<AppProps> = ({ Component, pageProps }) => {

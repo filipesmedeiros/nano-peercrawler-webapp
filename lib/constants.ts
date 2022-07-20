@@ -2,6 +2,10 @@ export const getPeersUrl =
   process.env.NEXT_PUBLIC_PEER_CRAWLER_URL ||
   'http://hetzner1.siganos.xyz:5001/peercrawler/json'
 
+export const getCommunityPeersInfoUrl =
+  process.env.NEXT_PUBLIC_COMMUNITY_PEERS_INFO ||
+  'https://nano.community/data/representative-mappings.json'
+
 export const network = process.env.NEXT_PUBLIC_NANO_NETWORK || 'live'
 
 export const github =

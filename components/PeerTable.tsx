@@ -7,24 +7,24 @@ import {
   SwitchVerticalIcon,
 } from '@heroicons/react/solid'
 import { Address6 } from 'ip-address'
-import { PeerInfo, SortDirection } from 'lib/types'
-import Link from 'next/link'
+import { MergedPeerInfo, SortDirection } from 'lib/types'
 import { useRouter } from 'next/router'
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { useTimeoutWhen } from 'rooks'
 
 export interface Props {
-  peers: PeerInfo[]
+  peers: MergedPeerInfo[]
   peerIdOrIpSearch?: string
 }
 
-type Column = 'peer_id' | 'ip' | 'is_voting' | 'last_seen'
+type Column = 'peer_id' | 'ip' | 'is_voting' | 'last_seen' | 'alias'
 
 type TableSorting = {
   [key in Column]: SortDirection
 }
 
 const defaultSorting: TableSorting = {
+  alias: undefined,
   peer_id: undefined,
   ip: undefined,
   is_voting: undefined,
@@ -90,6 +90,9 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
         } catch {
           valueB = ''
         }
+      } else if (currentSorted === 'alias') {
+        valueA = valueA ?? ''
+        valueB = valueB ?? ''
       }
 
       if (typeof valueA === 'string')
@@ -122,11 +125,11 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
   const SortingIcon: FC<{ column: Column }> = ({ column }) => (
     <button
       className="hover:text-accent active:text-accent"
-      onClick={() => onColumnClick('peer_id')}
+      onClick={() => onColumnClick(column)}
     >
       {tableSorting.sorting[column] === 'asc' ? (
         <SortDescendingIcon className="h-5 w-5" />
-      ) : tableSorting.sorting.peer_id === 'desc' ? (
+      ) : tableSorting.sorting[column] === 'desc' ? (
         <SortAscendingIcon className="h-5 w-5" />
       ) : (
         <SwitchVerticalIcon className="h-5 w-5" />
@@ -149,6 +152,12 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
           <th className="p-0" />
           <th>
             <div className="flex items-center gap-2">
+              Alias
+              <SortingIcon column="alias" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
               Peer ID
               <SortingIcon column="peer_id" />
             </div>
@@ -169,7 +178,15 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
       </thead>
       <tbody>
         {filteredPeers?.map(
-          ({ telemetry, peer_id, ip, is_voting, last_seen }) => (
+          ({
+            telemetry,
+            peer_id,
+            ip,
+            is_voting,
+            last_seen,
+            alias,
+            account,
+          }) => (
             <tr
               key={`${peer_id}-${ip}`}
               className="hover:active hover:cursor-pointer"
@@ -197,6 +214,18 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                   )
                 ) : (
                   '---'
+                )}
+              </td>
+              <td>
+                {account ? (
+                  <a
+                    href={`https://nano.community/${account}`}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    {alias ?? '---'}
+                  </a>
+                ) : (
+                  alias ?? '---'
                 )}
               </td>
               <td>

@@ -39,4 +39,16 @@ export interface PeerInfo {
   score: number | null
 }
 
+export interface NanoCommunityPeerInfo {
+  alias: string
+  account: string
+  weight: string
+  node_id: string
+  address: string
+  port: number
+}
+
+export type MergedPeerInfo = PeerInfo &
+  Partial<Omit<NanoCommunityPeerInfo, 'port' | 'address'>>
+
 export type SortDirection = 'asc' | 'desc' | undefined
