@@ -18,13 +18,14 @@ export interface Props {
   peerIdOrIpSearch?: string
 }
 
-type Column = 'peer_id' | 'ip' | 'is_voting' | 'last_seen' | 'alias'
+type Column = 'peer_id' | 'ip' | 'is_voting' | 'last_seen' | 'alias' | 'account'
 
 type TableSorting = {
   [key in Column]: SortDirection
 }
 
 const defaultSorting: TableSorting = {
+  account: undefined,
   alias: undefined,
   peer_id: undefined,
   ip: undefined,
@@ -71,7 +72,11 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
       let valueA = a[currentSorted]
       let valueB = b[currentSorted]
 
-      if (currentSorted === 'peer_id') {
+      if (
+        currentSorted === 'peer_id' ||
+        currentSorted === 'alias' ||
+        currentSorted === 'account'
+      ) {
         valueA = valueA ?? ''
         valueB = valueB ?? ''
       } else if (currentSorted === 'last_seen') {
@@ -91,9 +96,6 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
         } catch {
           valueB = ''
         }
-      } else if (currentSorted === 'alias') {
-        valueA = valueA ?? ''
-        valueB = valueB ?? ''
       }
 
       if (typeof valueA === 'string')
@@ -138,12 +140,8 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
     </button>
   )
 
-  const [copiedPeerId, setCopiedPeerId] = useState<string>()
-  useTimeoutWhen(
-    () => setCopiedPeerId(undefined),
-    2e3,
-    copiedPeerId !== undefined
-  )
+  const [copiedText, setCopiedText] = useState<string>()
+  useTimeoutWhen(() => setCopiedText(undefined), 2e3, copiedText !== undefined)
 
   return (
     <table className="table">
@@ -155,6 +153,12 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
             <div className="flex items-center gap-2">
               Alias
               <SortingIcon column="alias" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
+              Account
+              <SortingIcon column="account" />
             </div>
           </th>
           <th>
@@ -233,16 +237,46 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                 )}
               </td>
               <td>
+                {account ? (
+                  <div className="flex gap-2 items-center">
+                    <div
+                      onClick={e => {
+                        e.stopPropagation()
+                        navigator.clipboard.writeText(account)
+                        setCopiedText(account)
+                      }}
+                      className="tooltip tooltip-accent"
+                      data-tip={
+                        copiedText === account ? 'Copied!' : 'Click to copy'
+                      }
+                    >
+                      {`${account.substring(0, 12)}...${account.substring(
+                        account.length - 7,
+                        account.length
+                      )}`}
+                    </div>
+                    <a
+                      href={`https://nanolooker.com/account/${account}`}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
+                    </a>
+                  </div>
+                ) : (
+                  '---'
+                )}
+              </td>
+              <td>
                 {peer_id ? (
                   <div
                     onClick={e => {
                       e.stopPropagation()
                       navigator.clipboard.writeText(peer_id)
-                      setCopiedPeerId(peer_id)
+                      setCopiedText(peer_id)
                     }}
-                    className="tooltip tooltip-secondary"
+                    className="tooltip tooltip-accent"
                     data-tip={
-                      copiedPeerId === peer_id ? 'Copied!' : 'Click to copy'
+                      copiedText === peer_id ? 'Copied!' : 'Click to copy'
                     }
                   >
                     {`${peer_id?.substring(0, 10)}...${peer_id?.substring(
