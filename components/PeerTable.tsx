@@ -18,13 +18,21 @@ export interface Props {
   peerIdOrIpSearch?: string
 }
 
-type Column = 'peer_id' | 'ip' | 'is_voting' | 'last_seen' | 'alias' | 'account'
+type Column =
+  | 'peer_id'
+  | 'ip'
+  | 'is_voting'
+  | 'last_seen'
+  | 'alias'
+  | 'account'
+  | 'node_id'
 
 type TableSorting = {
   [key in Column]: SortDirection
 }
 
 const defaultSorting: TableSorting = {
+  node_id: undefined,
   account: undefined,
   alias: undefined,
   peer_id: undefined,
@@ -75,7 +83,8 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
       if (
         currentSorted === 'peer_id' ||
         currentSorted === 'alias' ||
-        currentSorted === 'account'
+        currentSorted === 'account' ||
+        currentSorted === 'node_id'
       ) {
         valueA = valueA ?? ''
         valueB = valueB ?? ''
@@ -163,6 +172,12 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
           </th>
           <th>
             <div className="flex items-center gap-2">
+              Node ID
+              <SortingIcon column="node_id" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
               Peer ID
               <SortingIcon column="peer_id" />
             </div>
@@ -191,6 +206,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
             last_seen,
             alias,
             account,
+            node_id,
           }) => (
             <tr
               key={`${peer_id}-${ip}`}
@@ -250,8 +266,8 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                         copiedText === account ? 'Copied!' : 'Click to copy'
                       }
                     >
-                      {`${account.substring(0, 12)}...${account.substring(
-                        account.length - 7,
+                      {`${account.substring(0, 10)}...${account.substring(
+                        account.length - 5,
                         account.length
                       )}`}
                     </div>
@@ -267,6 +283,14 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                 )}
               </td>
               <td>
+                {node_id
+                  ? `${node_id.substring(0, 10)}...${node_id.substring(
+                      node_id.length - 5,
+                      node_id.length
+                    )}`
+                  : '---'}
+              </td>
+              <td>
                 {peer_id ? (
                   <div
                     onClick={e => {
@@ -279,8 +303,8 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                       copiedText === peer_id ? 'Copied!' : 'Click to copy'
                     }
                   >
-                    {`${peer_id?.substring(0, 10)}...${peer_id?.substring(
-                      peer_id.length - 10,
+                    {`${peer_id?.substring(0, 7)}...${peer_id?.substring(
+                      peer_id.length - 7,
                       peer_id.length
                     )}`}
                   </div>
