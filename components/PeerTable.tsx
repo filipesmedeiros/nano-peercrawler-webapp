@@ -167,6 +167,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
     <button
       className="hover:text-accent active:text-accent"
       onClick={() => onColumnClick(column)}
+      title="Change sorting direction"
     >
       {tableSorting.sorting[column] === 'asc' ? (
         <SortDescendingIcon className="h-5 w-5" />
@@ -286,6 +287,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                     <a
                       href={`https://nano.community/${account}`}
                       onClick={e => e.stopPropagation()}
+                      title="nano.community rep page"
                     >
                       <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
                     </a>
@@ -316,6 +318,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                     <a
                       href={`https://nanolooker.com/account/${account}`}
                       onClick={e => e.stopPropagation()}
+                      title="Nanolooker account page"
                     >
                       <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
                     </a>
