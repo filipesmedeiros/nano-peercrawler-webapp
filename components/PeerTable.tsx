@@ -23,6 +23,7 @@ import useSWR from 'swr'
 export interface Props {
   peers: MergedPeerInfo[]
   search?: string
+  shortVersion: boolean
 }
 
 type Column =
@@ -50,7 +51,7 @@ const defaultSorting: TableSorting = {
   weight: undefined,
 }
 
-const PeerTable: FC<Props> = ({ peers, search }) => {
+const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
   const { push } = useRouter()
 
   const { data: networkData } =
@@ -202,12 +203,14 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
               <SortingIcon column="node_id" />
             </div>
           </th>
-          <th>
-            <div className="flex items-center gap-2">
-              Weight
-              <SortingIcon column="weight" />
-            </div>
-          </th>
+          {!shortVersion && (
+            <th>
+              <div className="flex items-center gap-2">
+                Weight
+                <SortingIcon column="weight" />
+              </div>
+            </th>
+          )}
           <th>
             <div className="flex items-center gap-2">
               Weight %
@@ -216,16 +219,18 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
           </th>
           <th>
             <div className="flex items-center gap-2">
-              Peer IP
+              Peer IP/port
               <SortingIcon column="ip" />
             </div>
           </th>
-          <th>
-            <div className="flex items-center gap-2">
-              Last seen
-              <SortingIcon column="last_seen" />
-            </div>
-          </th>
+          {!shortVersion && (
+            <th>
+              <div className="flex items-center gap-2">
+                Last seen
+                <SortingIcon column="last_seen" />
+              </div>
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>
@@ -240,6 +245,7 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
             account,
             node_id,
             weight,
+            port,
           }) => (
             <tr
               key={`${peer_id}-${ip}`}
@@ -273,7 +279,6 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
               <td>
                 {account ? (
                   <span className="flex gap-2 items-center">
-                    {alias ?? '---'}
                     <a
                       href={`https://nano.community/${account}`}
                       onClick={e => e.stopPropagation()}
@@ -281,6 +286,7 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
                     >
                       <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
                     </a>
+                    {alias ?? '---'}
                   </span>
                 ) : (
                   alias ?? '---'
@@ -289,6 +295,13 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
               <td>
                 {account ? (
                   <div className="flex gap-2 items-center">
+                    <a
+                      href={`https://nanolooker.com/account/${account}`}
+                      onClick={e => e.stopPropagation()}
+                      title="Nanolooker account page"
+                    >
+                      <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
+                    </a>
                     <div
                       onClick={e => {
                         e.stopPropagation()
@@ -305,13 +318,6 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
                         account.length
                       )}`}
                     </div>
-                    <a
-                      href={`https://nanolooker.com/account/${account}`}
-                      onClick={e => e.stopPropagation()}
-                      title="Nanolooker account page"
-                    >
-                      <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
-                    </a>
                   </div>
                 ) : (
                   '---'
@@ -339,27 +345,29 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
                   '---'
                 )}
               </td>
-              <td>
-                <div
-                  onClick={e => {
-                    e.stopPropagation()
-                    navigator.clipboard.writeText(weight ?? '0')
-                    setCopiedText(weight ?? '0')
-                  }}
-                  className="tooltip tooltip-accent"
-                  data-tip={
-                    copiedText === (weight ?? '0')
-                      ? 'Copied raw amount!'
-                      : 'Click to copy raw amount'
-                  }
-                >
-                  Ӿ
-                  {(+convert(weight ?? '0', {
-                    from: Unit.raw,
-                    to: Unit.Nano,
-                  })).toFixed(2)}
-                </div>
-              </td>
+              {!shortVersion && (
+                <td>
+                  <div
+                    onClick={e => {
+                      e.stopPropagation()
+                      navigator.clipboard.writeText(weight ?? '0')
+                      setCopiedText(weight ?? '0')
+                    }}
+                    className="tooltip tooltip-accent"
+                    data-tip={
+                      copiedText === (weight ?? '0')
+                        ? 'Copied raw amount!'
+                        : 'Click to copy raw amount'
+                    }
+                  >
+                    Ӿ
+                    {(+convert(weight ?? '0', {
+                      from: Unit.raw,
+                      to: Unit.Nano,
+                    })).toFixed(2)}
+                  </div>
+                </td>
+              )}
               <td>
                 {Big(weight ?? '0')
                   .div(networkData?.online_stake_total ?? '1')
@@ -368,11 +376,19 @@ const PeerTable: FC<Props> = ({ peers, search }) => {
                 %
               </td>
               <td>
-                {(ip?.startsWith('::ffff:') ? ip?.substring(7) : ip) ?? '---'}
+                {ip
+                  ? `${
+                      ip?.startsWith('::ffff:') ? ip?.substring(7) : `[${ip}]`
+                    }:${port}`
+                  : '---'}
               </td>
-              <td>
-                {last_seen ? new Date(last_seen * 1e3).toLocaleString() : '---'}
-              </td>
+              {!shortVersion && (
+                <td>
+                  {last_seen
+                    ? new Date(last_seen * 1e3).toLocaleString()
+                    : '---'}
+                </td>
+              )}
             </tr>
           )
         )}

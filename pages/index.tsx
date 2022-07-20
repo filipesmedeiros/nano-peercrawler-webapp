@@ -33,6 +33,8 @@ const Home = () => {
   const [peerIdOrIpSearch, setPeerIdOrIpSearch] = useState('')
   const peerIdOrIpSearchDebounced = useDebounce(peerIdOrIpSearch)
 
+  const [shortVersion, setShortVersion] = useState(false)
+
   return (
     <>
       {!mergedPeers && (
@@ -47,7 +49,6 @@ const Home = () => {
               <span>
                 <SearchIcon className="h-5 w-5" />
               </span>
-
               <input
                 className="input input-bordered"
                 onInput={e => setPeerIdOrIpSearch(e.currentTarget.value)}
@@ -56,7 +57,23 @@ const Home = () => {
               />
             </label>
           </div>
-          <PeerTable peers={mergedPeers} search={peerIdOrIpSearchDebounced} />
+
+          <div className="form-control">
+            <label className="label cursor-pointer w-fit flex gap-3">
+              <input
+                type="checkbox"
+                checked={shortVersion}
+                onChange={() => setShortVersion(prev => !prev)}
+                className="checkbox checkbox-primary"
+              />
+              <span className="label-text">Short version</span>
+            </label>
+          </div>
+          <PeerTable
+            shortVersion={shortVersion}
+            peers={mergedPeers}
+            search={peerIdOrIpSearchDebounced}
+          />
         </div>
       )}
     </>
