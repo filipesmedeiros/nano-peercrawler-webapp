@@ -42,7 +42,7 @@ const Home = () => {
       )}
       {mergedPeers && (
         <div className="flex flex-col gap-2 overflow-x-scroll">
-          <div className="form-control">
+          <div className="form-control sticky left-0">
             <label className="input-group w-fit">
               <span>
                 <SearchIcon className="h-5 w-5" />

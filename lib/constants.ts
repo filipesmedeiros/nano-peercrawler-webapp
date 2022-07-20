@@ -6,6 +6,9 @@ export const getCommunityPeersInfoUrl =
   process.env.NEXT_PUBLIC_COMMUNITY_PEERS_INFO ||
   'https://nano.community/data/representative-mappings.json'
 
+export const nanoRpcUrl =
+  process.env.NEXT_PUBLIC_NANO_RPC_URL || 'https://nano.filipesm.com/rpc'
+
 export const network = process.env.NEXT_PUBLIC_NANO_NETWORK || 'live'
 
 export const github =

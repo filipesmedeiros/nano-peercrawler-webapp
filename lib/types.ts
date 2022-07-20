@@ -52,3 +52,12 @@ export type MergedPeerInfo = PeerInfo &
   Partial<Omit<NanoCommunityPeerInfo, 'port' | 'address'>>
 
 export type SortDirection = 'asc' | 'desc' | undefined
+
+export interface ConfirmationQuorumResponse {
+  quorum_delta: string
+  online_weight_quorum_percent: string
+  online_weight_minimum: string
+  online_stake_total: string
+  peers_stake_total: string
+  trended_stake_total: string
+}

@@ -7,11 +7,20 @@ import {
   SortDescendingIcon,
   SwitchVerticalIcon,
 } from '@heroicons/react/solid'
+import Big from 'big.js'
 import { Address6 } from 'ip-address'
-import { MergedPeerInfo, SortDirection } from 'lib/types'
+import {
+  ConfirmationQuorumResponse,
+  MergedPeerInfo,
+  SortDirection,
+} from 'lib/types'
+import { Unit, convert } from 'nanocurrency'
 import { useRouter } from 'next/router'
 import { FC, useMemo, useState } from 'react'
 import { useTimeoutWhen } from 'rooks'
+import useSWR from 'swr'
+
+import { nanoRpcUrl } from '@lib/constants'
 
 export interface Props {
   peers: MergedPeerInfo[]
@@ -26,12 +35,15 @@ type Column =
   | 'alias'
   | 'account'
   | 'node_id'
+  | 'weight'
+  | 'weight_percentage'
 
 type TableSorting = {
   [key in Column]: SortDirection
 }
 
 const defaultSorting: TableSorting = {
+  weight_percentage: undefined,
   node_id: undefined,
   account: undefined,
   alias: undefined,
@@ -39,10 +51,14 @@ const defaultSorting: TableSorting = {
   ip: undefined,
   is_voting: undefined,
   last_seen: undefined,
+  weight: undefined,
 }
 
 const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
   const { push } = useRouter()
+
+  const { data: networkData } =
+    useSWR<ConfirmationQuorumResponse>('/api/networkData')
 
   const [tableSorting, setTableSorting] = useState<{
     currentSorted: Column | undefined
@@ -77,8 +93,10 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
     const sortDirection = tableSorting.sorting[currentSorted]
 
     const sortedPeers = [...peers].sort((a, b) => {
-      let valueA = a[currentSorted]
-      let valueB = b[currentSorted]
+      let valueA: string | number | boolean | null | undefined | bigint =
+        a[currentSorted === 'weight_percentage' ? 'weight' : currentSorted]
+      let valueB: string | number | boolean | null | undefined | bigint =
+        b[currentSorted === 'weight_percentage' ? 'weight' : currentSorted]
 
       if (
         currentSorted === 'peer_id' ||
@@ -105,6 +123,12 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
         } catch {
           valueB = ''
         }
+      } else if (currentSorted === 'weight') {
+        valueA = BigInt(valueA ?? '0')
+        valueB = BigInt(valueB ?? '0')
+      } else if (currentSorted === 'weight_percentage') {
+        valueA = BigInt(a.weight ?? '0')
+        valueB = BigInt(b.weight ?? '0')
       }
 
       if (typeof valueA === 'string')
@@ -118,6 +142,11 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
         )
       else if (typeof valueA === 'boolean')
         return (sortDirection === 'asc' ? valueA : valueB ?? false) ? 1 : -1
+      else if (typeof valueA === 'bigint')
+        return +(
+          (sortDirection === 'asc' ? valueA : (valueB as bigint)) -
+          ((sortDirection === 'asc' ? (valueB as bigint) : valueA) as bigint)
+        ).toString()
       else return 1
     })
 
@@ -156,7 +185,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
     <table className="table">
       <thead>
         <tr>
-          <th className="p-0" />
+          <th className="p-0 !static" />
           <th className="p-0" />
           <th>
             <div className="flex items-center gap-2">
@@ -174,6 +203,18 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
             <div className="flex items-center gap-2">
               Node ID
               <SortingIcon column="node_id" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
+              Weight
+              <SortingIcon column="weight" />
+            </div>
+          </th>
+          <th>
+            <div className="flex items-center gap-2">
+              Weight %
+              <SortingIcon column="weight_percentage" />
             </div>
           </th>
           <th>
@@ -207,6 +248,7 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
             alias,
             account,
             node_id,
+            weight,
           }) => (
             <tr
               key={`${peer_id}-${ip}`}
@@ -289,6 +331,34 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                       node_id.length
                     )}`
                   : '---'}
+              </td>
+              <td>
+                <div
+                  onClick={e => {
+                    e.stopPropagation()
+                    navigator.clipboard.writeText(weight ?? '0')
+                    setCopiedText(weight ?? '0')
+                  }}
+                  className="tooltip tooltip-accent"
+                  data-tip={
+                    copiedText === (weight ?? '0')
+                      ? 'Copied raw amount!'
+                      : 'Click to copy raw amount'
+                  }
+                >
+                  Ӿ
+                  {(+convert(weight ?? '0', {
+                    from: Unit.raw,
+                    to: Unit.Nano,
+                  })).toFixed(2)}
+                </div>
+              </td>
+              <td>
+                {Big(weight ?? '0')
+                  .div(networkData?.online_stake_total ?? '1')
+                  .times(100)
+                  .toFixed(2)}
+                %
               </td>
               <td>
                 {peer_id ? (
