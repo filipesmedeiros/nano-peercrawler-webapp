@@ -2,6 +2,7 @@ import {
   ArchiveIcon,
   BadgeCheckIcon,
   BanIcon,
+  ExternalLinkIcon,
   SortAscendingIcon,
   SortDescendingIcon,
   SwitchVerticalIcon,
@@ -218,12 +219,15 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
               </td>
               <td>
                 {account ? (
-                  <a
-                    href={`https://nano.community/${account}`}
-                    onClick={e => e.stopPropagation()}
-                  >
+                  <span className="flex gap-2 items-center">
                     {alias ?? '---'}
-                  </a>
+                    <a
+                      href={`https://nano.community/${account}`}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <ExternalLinkIcon className="h-5 w-5 hover:text-accent" />
+                    </a>
+                  </span>
                 ) : (
                   alias ?? '---'
                 )}
