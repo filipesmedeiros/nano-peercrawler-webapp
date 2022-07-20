@@ -203,14 +203,12 @@ const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
               <SortingIcon column="node_id" />
             </div>
           </th>
-          {!shortVersion && (
-            <th>
-              <div className="flex items-center gap-2">
-                Weight
-                <SortingIcon column="weight" />
-              </div>
-            </th>
-          )}
+          <th>
+            <div className="flex items-center gap-2">
+              Weight
+              <SortingIcon column="weight" />
+            </div>
+          </th>
           <th>
             <div className="flex items-center gap-2">
               Weight %
@@ -223,14 +221,12 @@ const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
               <SortingIcon column="ip" />
             </div>
           </th>
-          {!shortVersion && (
-            <th>
-              <div className="flex items-center gap-2">
-                Last seen
-                <SortingIcon column="last_seen" />
-              </div>
-            </th>
-          )}
+          <th>
+            <div className="flex items-center gap-2">
+              Last seen
+              <SortingIcon column="last_seen" />
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -345,29 +341,27 @@ const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
                   '---'
                 )}
               </td>
-              {!shortVersion && (
-                <td>
-                  <div
-                    onClick={e => {
-                      e.stopPropagation()
-                      navigator.clipboard.writeText(weight ?? '0')
-                      setCopiedText(weight ?? '0')
-                    }}
-                    className="tooltip tooltip-accent"
-                    data-tip={
-                      copiedText === (weight ?? '0')
-                        ? 'Copied raw amount!'
-                        : 'Click to copy raw amount'
-                    }
-                  >
-                    Ӿ
-                    {(+convert(weight ?? '0', {
-                      from: Unit.raw,
-                      to: Unit.Nano,
-                    })).toFixed(2)}
-                  </div>
-                </td>
-              )}
+              <td>
+                <div
+                  onClick={e => {
+                    e.stopPropagation()
+                    navigator.clipboard.writeText(weight ?? '0')
+                    setCopiedText(weight ?? '0')
+                  }}
+                  className="tooltip tooltip-accent"
+                  data-tip={
+                    copiedText === (weight ?? '0')
+                      ? 'Copied raw amount!'
+                      : 'Click to copy raw amount'
+                  }
+                >
+                  Ӿ
+                  {(+convert(weight ?? '0', {
+                    from: Unit.raw,
+                    to: Unit.Nano,
+                  })).toFixed(2)}
+                </div>
+              </td>
               <td>
                 {Big(weight ?? '0')
                   .div(networkData?.online_stake_total ?? '1')
@@ -403,13 +397,9 @@ const PeerTable: FC<Props> = ({ peers, search, shortVersion }) => {
                   '---'
                 )}
               </td>
-              {!shortVersion && (
-                <td>
-                  {last_seen
-                    ? new Date(last_seen * 1e3).toLocaleString()
-                    : '---'}
-                </td>
-              )}
+              <td>
+                {last_seen ? new Date(last_seen * 1e3).toLocaleString() : '---'}
+              </td>
             </tr>
           )
         )}
