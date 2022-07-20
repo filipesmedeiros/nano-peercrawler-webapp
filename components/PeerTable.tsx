@@ -20,15 +20,12 @@ import { FC, useMemo, useState } from 'react'
 import { useTimeoutWhen } from 'rooks'
 import useSWR from 'swr'
 
-import { nanoRpcUrl } from '@lib/constants'
-
 export interface Props {
   peers: MergedPeerInfo[]
-  peerIdOrIpSearch?: string
+  search?: string
 }
 
 type Column =
-  | 'peer_id'
   | 'ip'
   | 'is_voting'
   | 'last_seen'
@@ -47,14 +44,13 @@ const defaultSorting: TableSorting = {
   node_id: undefined,
   account: undefined,
   alias: undefined,
-  peer_id: undefined,
   ip: undefined,
   is_voting: undefined,
   last_seen: undefined,
   weight: undefined,
 }
 
-const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
+const PeerTable: FC<Props> = ({ peers, search }) => {
   const { push } = useRouter()
 
   const { data: networkData } =
@@ -99,7 +95,6 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
         b[currentSorted === 'weight_percentage' ? 'weight' : currentSorted]
 
       if (
-        currentSorted === 'peer_id' ||
         currentSorted === 'alias' ||
         currentSorted === 'account' ||
         currentSorted === 'node_id'
@@ -154,14 +149,15 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
   }, [peers, tableSorting])
 
   const filteredPeers = useMemo(() => {
-    if (!peerIdOrIpSearch) return sortedPeers
+    if (!search) return sortedPeers
     else
       return sortedPeers?.filter(
         peer =>
-          peer.ip?.includes(peerIdOrIpSearch) ||
-          peer.peer_id?.includes(peerIdOrIpSearch)
+          peer.ip?.includes(search) ||
+          peer.account?.includes(search) ||
+          peer.node_id?.includes(search)
       )
-  }, [sortedPeers, peerIdOrIpSearch])
+  }, [sortedPeers, search])
 
   const SortingIcon: FC<{ column: Column }> = ({ column }) => (
     <button
@@ -216,12 +212,6 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
             <div className="flex items-center gap-2">
               Weight %
               <SortingIcon column="weight_percentage" />
-            </div>
-          </th>
-          <th>
-            <div className="flex items-center gap-2">
-              Peer ID
-              <SortingIcon column="peer_id" />
             </div>
           </th>
           <th>
@@ -328,12 +318,26 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                 )}
               </td>
               <td>
-                {node_id
-                  ? `${node_id.substring(0, 10)}...${node_id.substring(
+                {node_id ? (
+                  <div
+                    onClick={e => {
+                      e.stopPropagation()
+                      navigator.clipboard.writeText(node_id)
+                      setCopiedText(node_id)
+                    }}
+                    className="tooltip tooltip-accent"
+                    data-tip={
+                      copiedText === node_id ? 'Copied!' : 'Click to copy'
+                    }
+                  >
+                    {`${node_id.substring(0, 10)}...${node_id.substring(
                       node_id.length - 5,
                       node_id.length
-                    )}`
-                  : '---'}
+                    )}`}
+                  </div>
+                ) : (
+                  '---'
+                )}
               </td>
               <td>
                 <div
@@ -364,28 +368,8 @@ const PeerTable: FC<Props> = ({ peers, peerIdOrIpSearch }) => {
                 %
               </td>
               <td>
-                {peer_id ? (
-                  <div
-                    onClick={e => {
-                      e.stopPropagation()
-                      navigator.clipboard.writeText(peer_id)
-                      setCopiedText(peer_id)
-                    }}
-                    className="tooltip tooltip-accent"
-                    data-tip={
-                      copiedText === peer_id ? 'Copied!' : 'Click to copy'
-                    }
-                  >
-                    {`${peer_id?.substring(0, 7)}...${peer_id?.substring(
-                      peer_id.length - 7,
-                      peer_id.length
-                    )}`}
-                  </div>
-                ) : (
-                  '---'
-                )}
+                {(ip?.startsWith('::ffff:') ? ip?.substring(7) : ip) ?? '---'}
               </td>
-              <td>{ip ?? '---'}</td>
               <td>
                 {last_seen ? new Date(last_seen * 1e3).toLocaleString() : '---'}
               </td>

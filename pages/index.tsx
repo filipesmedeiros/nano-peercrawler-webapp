@@ -56,10 +56,7 @@ const Home = () => {
               />
             </label>
           </div>
-          <PeerTable
-            peers={mergedPeers}
-            peerIdOrIpSearch={peerIdOrIpSearchDebounced}
-          />
+          <PeerTable peers={mergedPeers} search={peerIdOrIpSearchDebounced} />
         </div>
       )}
     </>
